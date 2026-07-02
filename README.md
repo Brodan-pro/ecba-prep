@@ -54,9 +54,9 @@ cd ecba-prep
 npm install
 ```
 
-> 💡 Replace `YOUR_GITHUB_USERNAME` with the actual GitHub username of whoever shared this repo. For example, if the repo link is `github.com/brodanazis/ecba-prep`, run:
+> 💡 Replace `YOUR_GITHUB_USERNAME` with the actual GitHub username of whoever shared this repo. For example, if the repo link is `github.com/Brodan-pro/ecba-prep`, run:
 > ```bash
-> git clone https://github.com/brodanazis/ecba-prep.git
+> git clone https://github.com/Brodan-pro/ecba-prep.git
 > cd ecba-prep
 > npm install
 > ```
@@ -71,9 +71,9 @@ cd ecba-prep
 npm install
 ```
 
-> 💡 Ganti `YOUR_GITHUB_USERNAME` dengan username GitHub milik orang yang membagikan repo ini. Contoh, kalau link repo-nya `github.com/brodanazis/ecba-prep`, maka jalankan:
+> 💡 Ganti `YOUR_GITHUB_USERNAME` dengan username GitHub milik orang yang membagikan repo ini. Contoh, kalau link repo-nya `github.com/Brodan-pro/ecba-prep`, maka jalankan:
 > ```bash
-> git clone https://github.com/brodanazis/ecba-prep.git
+> git clone https://github.com/Brodan-pro/ecba-prep.git
 > cd ecba-prep
 > npm install
 > ```
