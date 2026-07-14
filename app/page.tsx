@@ -1,4 +1,5 @@
 "use client";
+<<<<<<< HEAD
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
@@ -6,6 +7,16 @@ import { Brain, BookOpen, Target, Loader2 } from "lucide-react";
 
 export default function AuthPage() {
   const [mode, setMode] = useState<"signin"|"signup">("signin");
+=======
+
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/contexts/AuthContext";
+import { BookOpen, Brain, Target, Loader2 } from "lucide-react";
+
+export default function AuthPage() {
+  const [mode, setMode] = useState<"signin" | "signup">("signin");
+>>>>>>> 3b7046a0b58d7708e0e862a897727b2e91e1180c
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -16,6 +27,7 @@ export default function AuthPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+<<<<<<< HEAD
     setError(""); setLoading(true);
     try {
       if (mode === "signup") await signUp(email, password, name);
@@ -30,6 +42,31 @@ export default function AuthPage() {
         "Something went wrong. Please try again."
       );
     } finally { setLoading(false); }
+=======
+    setError("");
+    setLoading(true);
+    try {
+      if (mode === "signup") {
+        await signUp(email, password, name);
+      } else {
+        await signIn(email, password);
+      }
+      router.push("/dashboard");
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Something went wrong";
+      setError(
+        msg.includes("email-already-in-use")
+          ? "Email already registered. Try signing in."
+          : msg.includes("wrong-password") || msg.includes("invalid-credential")
+          ? "Invalid email or password."
+          : msg.includes("weak-password")
+          ? "Password must be at least 6 characters."
+          : "Something went wrong. Please try again."
+      );
+    } finally {
+      setLoading(false);
+    }
+>>>>>>> 3b7046a0b58d7708e0e862a897727b2e91e1180c
   };
 
   return (
@@ -42,15 +79,29 @@ export default function AuthPage() {
             </div>
             <span className="text-white font-bold text-xl">ECBA Prep AI</span>
           </div>
+<<<<<<< HEAD
           <h1 className="text-4xl font-bold text-white leading-tight mb-6">Master your ECBA with AI-powered practice</h1>
           <p className="text-violet-200 text-lg">Situational questions · Bilingual explanations · Gamified learning · 100% free</p>
+=======
+          <h1 className="text-4xl font-bold text-white leading-tight mb-6">
+            Master your ECBA exam with AI-powered practice
+          </h1>
+          <p className="text-violet-200 text-lg leading-relaxed">
+            Situational questions crafted by AI. Bilingual explanations. Full exam simulation.
+          </p>
+>>>>>>> 3b7046a0b58d7708e0e862a897727b2e91e1180c
         </div>
         <div className="space-y-4">
           {[
             { icon: BookOpen, title: "9 Domain Coverage", desc: "All ECBA blueprint domains covered" },
             { icon: Target, title: "Exam Simulation", desc: "50 questions in 75 minutes" },
+<<<<<<< HEAD
             { icon: Brain, title: "XP, Streaks & Badges", desc: "Stay motivated with gamification" },
           ].map(f => (
+=======
+            { icon: Brain, title: "Bilingual Explanations", desc: "English & Bahasa Indonesia" },
+          ].map((f) => (
+>>>>>>> 3b7046a0b58d7708e0e862a897727b2e91e1180c
             <div key={f.title} className="flex items-start gap-4">
               <div className="w-10 h-10 bg-white/15 rounded-lg flex items-center justify-center flex-shrink-0">
                 <f.icon className="w-5 h-5 text-white" />
@@ -72,6 +123,7 @@ export default function AuthPage() {
             </div>
             <span className="text-violet-600 font-bold text-xl">ECBA Prep AI</span>
           </div>
+<<<<<<< HEAD
           <div className="bg-white rounded-2xl shadow-xl p-8 border border-slate-100">
             <h2 className="text-2xl font-bold text-slate-900 mb-1">{mode === "signin" ? "Welcome back" : "Create account"}</h2>
             <p className="text-slate-500 mb-6 text-sm">{mode === "signin" ? "Sign in to continue your prep" : "Start your ECBA journey today"}</p>
@@ -79,20 +131,50 @@ export default function AuthPage() {
               {(["signin","signup"] as const).map(m => (
                 <button key={m} onClick={() => { setMode(m); setError(""); }}
                   className={`flex-1 py-2 rounded-lg text-sm font-medium transition-all ${mode===m?"bg-white text-slate-900 shadow-sm":"text-slate-500"}`}>
+=======
+
+          <div className="bg-white rounded-2xl shadow-xl p-8 border border-slate-100">
+            <h2 className="text-2xl font-bold text-slate-900 mb-1">
+              {mode === "signin" ? "Welcome back" : "Create account"}
+            </h2>
+            <p className="text-slate-500 mb-8 text-sm">
+              {mode === "signin" ? "Sign in to continue your prep" : "Start your ECBA journey today"}
+            </p>
+
+            <div className="flex bg-slate-100 rounded-xl p-1 mb-6">
+              {(["signin", "signup"] as const).map((m) => (
+                <button
+                  key={m}
+                  onClick={() => { setMode(m); setError(""); }}
+                  className={`flex-1 py-2 rounded-lg text-sm font-medium transition-all ${
+                    mode === m ? "bg-white text-slate-900 shadow-sm" : "text-slate-500 hover:text-slate-700"
+                  }`}
+                >
+>>>>>>> 3b7046a0b58d7708e0e862a897727b2e91e1180c
                   {m === "signin" ? "Sign In" : "Sign Up"}
                 </button>
               ))}
             </div>
+<<<<<<< HEAD
+=======
+
+>>>>>>> 3b7046a0b58d7708e0e862a897727b2e91e1180c
             <form onSubmit={handleSubmit} className="space-y-4">
               {mode === "signup" && (
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-1.5">Full Name</label>
+<<<<<<< HEAD
                   <input type="text" value={name} onChange={e=>setName(e.target.value)} placeholder="Your name" required
                     className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-violet-500 text-sm" />
+=======
+                  <input type="text" value={name} onChange={(e) => setName(e.target.value)} placeholder="Your name" required
+                    className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-violet-500 text-sm" />
+>>>>>>> 3b7046a0b58d7708e0e862a897727b2e91e1180c
                 </div>
               )}
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-1.5">Email</label>
+<<<<<<< HEAD
                 <input type="email" value={email} onChange={e=>setEmail(e.target.value)} placeholder="you@example.com" required
                   className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-violet-500 text-sm" />
               </div>
@@ -105,6 +187,23 @@ export default function AuthPage() {
               <button type="submit" disabled={loading}
                 className="w-full bg-violet-600 hover:bg-violet-700 disabled:bg-violet-400 text-white font-semibold py-3 rounded-xl flex items-center justify-center gap-2">
                 {loading ? <><Loader2 className="w-4 h-4 animate-spin" />{mode==="signin"?"Signing in...":"Creating..."}</> : mode==="signin"?"Sign In":"Create Account"}
+=======
+                <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@example.com" required
+                  className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-violet-500 text-sm" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1.5">Password</label>
+                <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Min. 6 characters" required
+                  className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-violet-500 text-sm" />
+              </div>
+              {error && (
+                <div className="bg-red-50 border border-red-100 text-red-600 text-sm px-4 py-3 rounded-xl">{error}</div>
+              )}
+              <button type="submit" disabled={loading}
+                className="w-full bg-violet-600 hover:bg-violet-700 disabled:bg-violet-400 text-white font-semibold py-3 rounded-xl flex items-center justify-center gap-2 mt-2">
+                {loading ? <><Loader2 className="w-4 h-4 animate-spin" />{mode === "signin" ? "Signing in..." : "Creating..."}</> 
+                  : mode === "signin" ? "Sign In" : "Create Account"}
+>>>>>>> 3b7046a0b58d7708e0e862a897727b2e91e1180c
               </button>
             </form>
           </div>
