@@ -11,22 +11,14 @@
   "dependencies": {
     "@google/generative-ai": "^0.24.1",
     "clsx": "^2.1.1",
-<<<<<<< HEAD
     "firebase": "^12.16.0",
     "html2canvas": "^1.4.1",
     "lucide-react": "^1.24.0",
     "next": "16.2.10",
     "react": "19.2.4",
     "react-dom": "19.2.4",
-    "recharts": "^3.9.2"
-=======
-    "firebase": "^12.15.0",
-    "lucide-react": "^1.21.0",
-    "next": "16.2.9",
-    "react": "19.2.4",
-    "react-dom": "19.2.4",
+    "recharts": "^3.9.2",
     "tailwind-merge": "^3.6.0"
->>>>>>> 3b7046a0b58d7708e0e862a897727b2e91e1180c
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
@@ -34,11 +26,7 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
-<<<<<<< HEAD
     "eslint-config-next": "16.2.10",
-=======
-    "eslint-config-next": "16.2.9",
->>>>>>> 3b7046a0b58d7708e0e862a897727b2e91e1180c
     "tailwindcss": "^4",
     "typescript": "^5"
   }
