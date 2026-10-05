@@ -178,3 +178,80 @@ export const ECBA_TECHNIQUES = [
 
 export const TOTAL_EXAM_QUESTIONS = 50;
 export const EXAM_DURATION_SECONDS = 75 * 60; // 75 minutes
+
+export interface Badge {
+  id: string;
+  name: string;
+  icon: string;
+  desc: string;
+}
+
+export const BADGES: Badge[] = [
+  { id: "first_steps", name: "First Steps", icon: "🎯", desc: "Selesaikan sesi latihan pertama" },
+  { id: "streak_3", name: "On Fire", icon: "🔥", desc: "Streak 3 hari berturut-turut" },
+  { id: "streak_7", name: "Unstoppable", icon: "⚡", desc: "Streak 7 hari berturut-turut" },
+  { id: "perfect", name: "Perfect Score", icon: "💯", desc: "Dapat skor 100% di satu sesi" },
+  { id: "simulator", name: "Exam Ready", icon: "🏆", desc: "Selesaikan simulasi ujian penuh" },
+  { id: "domain_explorer", name: "Domain Explorer", icon: "📚", desc: "Latihan di semua 9 domain" },
+  { id: "xp_500", name: "Rising Star", icon: "⭐", desc: "Kumpulkan 500 XP" },
+  { id: "xp_1000", name: "BA Scholar", icon: "🎓", desc: "Kumpulkan 1000 XP" },
+];
+
+const LEVELS = [
+  { level: 1, name: "BA Beginner", xpRequired: 0 },
+  { level: 2, name: "BA Learner", xpRequired: 100 },
+  { level: 3, name: "BA Practitioner", xpRequired: 300 },
+  { level: 4, name: "BA Analyst", xpRequired: 600 },
+  { level: 5, name: "ECBA Ready", xpRequired: 1000 },
+  { level: 6, name: "BA Expert", xpRequired: 1500 },
+  { level: 7, name: "BA Master", xpRequired: 2500 },
+];
+
+export function getLevelFromXP(totalXP: number) {
+  let level = 1;
+  let name = LEVELS[0].name;
+
+  for (const entry of LEVELS) {
+    if (totalXP >= entry.xpRequired) {
+      level = entry.level;
+      name = entry.name;
+    }
+  }
+
+  const currentLevel = LEVELS.find((entry) => entry.level === level)!;
+  const nextLevel = LEVELS.find((entry) => entry.level === level + 1);
+  const currentXP = totalXP - currentLevel.xpRequired;
+  const nextXP = nextLevel ? nextLevel.xpRequired - currentLevel.xpRequired : currentXP;
+  const progress = nextLevel ? Math.min(100, Math.round((currentXP / nextXP) * 100)) : 100;
+
+  return { level, name, progress, currentXP, nextXP };
+}
+
+interface DailySessionSummary {
+  domainNumber: number;
+  domainName: string;
+  score: number;
+  total: number;
+  isSimulation?: boolean;
+}
+
+export function generateDailySummary(sessions: DailySessionSummary[]): string {
+  if (sessions.length === 0) return "";
+
+  const totalQuestions = sessions.reduce((sum, session) => sum + session.total, 0);
+  const totalCorrect = sessions.reduce((sum, session) => sum + session.score, 0);
+  const accuracy = Math.round((totalCorrect / totalQuestions) * 100);
+  const domains = sessions
+    .filter((session) => !session.isSimulation)
+    .map((session) => `Domain ${session.domainNumber}`);
+  const hasSimulation = sessions.some((session) => session.isSimulation);
+
+  let summary = `Hari ini kamu menyelesaikan ${sessions.length} sesi (${totalQuestions} soal, akurasi ${accuracy}%).`;
+  if (domains.length > 0) summary += ` Latihan di: ${domains.join(", ")}.`;
+  if (hasSimulation) summary += " Termasuk simulasi ujian penuh!";
+  if (accuracy >= 80) summary += " Keren banget! 💪";
+  else if (accuracy >= 60) summary += " Terus tingkatkan ya! 📈";
+  else summary += " Review penjelasannya dan coba lagi! 📖";
+
+  return summary;
+}

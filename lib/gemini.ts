@@ -19,9 +19,39 @@ export interface Question {
   babok_reference: string;
 }
 
-const genAI = new GoogleGenerativeAI(
-  process.env.NEXT_PUBLIC_GEMINI_API_KEY || ""
-);
+const API_KEY_STORAGE = "ecba_gemini_api_key";
+
+export function getApiKey(): string | null {
+  if (typeof window === "undefined") return null;
+  return localStorage.getItem(API_KEY_STORAGE);
+}
+
+export function saveApiKey(key: string): void {
+  if (typeof window === "undefined") return;
+  localStorage.setItem(API_KEY_STORAGE, key);
+}
+
+export function removeApiKey(): void {
+  if (typeof window === "undefined") return;
+  localStorage.removeItem(API_KEY_STORAGE);
+}
+
+export async function validateApiKey(key: string): Promise<boolean> {
+  try {
+    const testAI = new GoogleGenerativeAI(key);
+    const model = testAI.getGenerativeModel({ model: "gemini-2.5-flash-lite" });
+    await model.generateContent("Say OK");
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+function getGenAI(): GoogleGenerativeAI {
+  const key = getApiKey() || process.env.NEXT_PUBLIC_GEMINI_API_KEY || "";
+  if (!key) throw new Error("NO_API_KEY");
+  return new GoogleGenerativeAI(key);
+}
 
 // Model fallback list — kalau satu overload, coba yang berikutnya
 const MODEL_FALLBACKS = [
@@ -44,7 +74,7 @@ async function callWithRetry(
     const modelName = MODEL_FALLBACKS[modelIndex];
     
     // SETUP KHUSUS: Bikin AI nggak "liar" dan output konsisten
-    const model = genAI.getGenerativeModel({ 
+    const model = getGenAI().getGenerativeModel({ 
       model: modelName,
       generationConfig: {
         temperature: 0.2, // Rendah = lebih faktual, logis, tidak berimajinasi liar
