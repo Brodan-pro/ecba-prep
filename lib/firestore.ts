@@ -13,9 +13,20 @@ import {
 } from "firebase/firestore";
 import { db } from "./firebase";
 import { Question } from "./gemini";
-import { BADGES } from "./domains";
-'?';
-/.'
+export interface UserProfile {
+  uid: string;
+  displayName: string;
+  email: string;
+  totalXP: number;
+  totalSessions: number;
+  totalQuestions: number;
+  totalCorrect: number;
+  earnedBadges: string[];
+  currentStreak: number;
+  bestStreak: number;
+  lastActiveDate: string;
+  domainStats: Record<string, { sessions: number; totalCorrect: number; totalQ: number }>;
+}
 export interface PracticeSession {
   id?: string;
   userId: string;
