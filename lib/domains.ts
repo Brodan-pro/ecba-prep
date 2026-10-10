@@ -235,7 +235,10 @@ interface DailySessionSummary {
   isSimulation?: boolean;
 }
 
-export function generateDailySummary(sessions: DailySessionSummary[]): string {
+export function generateDailySummary(
+  sessions: DailySessionSummary[],
+  lang: "en" | "id" = "id"
+): string {
   if (sessions.length === 0) return "";
 
   const totalQuestions = sessions.reduce((sum, session) => sum + session.total, 0);
@@ -245,6 +248,17 @@ export function generateDailySummary(sessions: DailySessionSummary[]): string {
     .filter((session) => !session.isSimulation)
     .map((session) => `Domain ${session.domainNumber}`);
   const hasSimulation = sessions.some((session) => session.isSimulation);
+
+  if (lang === "en") {
+    const sessionWord = sessions.length === 1 ? "session" : "sessions";
+    let summary = `Today you completed ${sessions.length} ${sessionWord} (${totalQuestions} questions, ${accuracy}% accuracy).`;
+    if (domains.length > 0) summary += ` Practiced: ${domains.join(", ")}.`;
+    if (hasSimulation) summary += " Including a full exam simulation!";
+    if (accuracy >= 80) summary += " Great job! 💪";
+    else if (accuracy >= 60) summary += " Keep improving! 📈";
+    else summary += " Review the explanations and try again! 📖";
+    return summary;
+  }
 
   let summary = `Hari ini kamu menyelesaikan ${sessions.length} sesi (${totalQuestions} soal, akurasi ${accuracy}%).`;
   if (domains.length > 0) summary += ` Latihan di: ${domains.join(", ")}.`;

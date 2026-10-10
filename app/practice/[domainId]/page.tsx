@@ -13,7 +13,7 @@ import {
 import Link from "next/link";
 
 /** Menangani Date, Firestore Timestamp (toDate), maupun { seconds } */
-function formatSessionDate(value: unknown): string {
+function formatSessionDate(value: unknown, locale: string): string {
   if (!value) return "—";
   let date: Date | null = null;
   if (value instanceof Date) {
@@ -24,15 +24,48 @@ function formatSessionDate(value: unknown): string {
     date = new Date((value as { seconds: number }).seconds * 1000);
   }
   return date
-    ? date.toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric" })
+    ? date.toLocaleDateString(locale, { day: "numeric", month: "short", year: "numeric" })
     : "—";
 }
+
+type Lang = "en" | "id";
+const LANG_KEY = "ecba_lang"; // kunci yang sama dengan halaman Analytics
+const LOCALE: Record<Lang, string> = { en: "en-US", id: "id-ID" };
+
+const MSG: Record<Lang, { userLimit: string; globalLimit: string }> = {
+  en: {
+    userLimit: "Your daily demo limit is used up. Try again tomorrow (resets 07:00 WIB), or sign up and add your own API key in Settings (no limit).",
+    globalLimit: "Today's demo quota is used up for all visitors. Try again tomorrow, or add your own API key in Settings.",
+  },
+  id: {
+    userLimit: "Batas demo harianmu habis. Coba lagi besok (reset jam 07.00 WIB), atau daftar dan pakai API key sendiri di Settings (tanpa batas).",
+    globalLimit: "Kuota demo hari ini habis untuk semua pengunjung. Coba lagi besok, atau pakai API key sendiri di Settings.",
+  },
+};
 
 export default function PracticePage({ params }: { params: Promise<{ domainId: string }> }) {
   const { domainId } = use(params);
   const { user, loading, refreshProfile } = useAuth();
   const router = useRouter();
   const domain = ECBA_DOMAINS.find((d) => d.id === domainId);
+
+  const [lang, setLang] = useState<Lang>(() => {
+    if (typeof window === "undefined") return "en";
+    try {
+      return window.localStorage.getItem(LANG_KEY) === "id" ? "id" : "en";
+    } catch {
+      return "en";
+    }
+  });
+  const changeLang = (next: Lang) => {
+    setLang(next);
+    setExpLang({}); // penjelasan ikut bahasa baru
+    try {
+      window.localStorage.setItem(LANG_KEY, next);
+    } catch {
+      /* abaikan */
+    }
+  };
 
   const [questions, setQuestions] = useState<Question[]>([]);
   const [answers, setAnswers] = useState<Record<string, string>>({});
@@ -92,9 +125,9 @@ export default function PracticePage({ params }: { params: Promise<{ domainId: s
       const msg = e instanceof Error ? e.message : "";
       if (msg === "NO_API_KEY") setShowApiModal(true);
       else if (msg === "DEMO_USER_LIMIT")
-        setError("Batas demo harianmu habis. Coba lagi besok, atau daftar dan pakai API key sendiri di Settings (tanpa batas).");
+        setError(MSG[lang].userLimit);
       else if (msg === "DEMO_GLOBAL_LIMIT")
-        setError("Kuota demo hari ini habis untuk semua pengunjung. Coba lagi besok, atau pakai API key sendiri di Settings.");
+        setError(MSG[lang].globalLimit);
       else if (msg.includes("All models failed"))
         setError("Gemini is overloaded. Auto-retried — please wait and try again.");
       else setError("Failed to generate. Please try again.");
@@ -175,6 +208,20 @@ export default function PracticePage({ params }: { params: Promise<{ domainId: s
               <p className="text-xs text-slate-400">{domain.weight}% of ECBA exam</p>
             </div>
           </div>
+          <div className="flex items-center rounded-xl bg-slate-100 p-0.5" role="group" aria-label="Language">
+            {(["en", "id"] as const).map((l) => (
+              <button
+                key={l}
+                onClick={() => changeLang(l)}
+                aria-pressed={lang === l}
+                className={`px-2.5 py-1 text-xs font-semibold rounded-lg transition-colors ${
+                  lang === l ? "bg-white text-violet-700 shadow-sm" : "text-slate-500 hover:text-slate-700"
+                }`}
+              >
+                {l.toUpperCase()}
+              </button>
+            ))}
+          </div>
           <button
             onClick={() => setShowHistory(!showHistory)}
             className="flex items-center gap-1.5 text-sm text-slate-500 hover:text-slate-900 px-3 py-1.5 rounded-lg hover:bg-slate-100"
@@ -205,7 +252,7 @@ export default function PracticePage({ params }: { params: Promise<{ domainId: s
                     <div>
                       <p className="text-sm font-medium text-slate-900">Session {history.length - i}</p>
                       <p className="text-xs text-slate-400">
-                        {formatSessionDate(s.createdAt)}
+                        {formatSessionDate(s.createdAt, LOCALE[lang])}
                         {s.xpEarned ? ` · +${s.xpEarned} XP` : ""}
                       </p>
                     </div>
@@ -314,7 +361,7 @@ export default function PracticePage({ params }: { params: Promise<{ domainId: s
               {questions.map((q, index) => {
                 const userAnswer = answers[q.id];
                 const isCorrect = userAnswer === q.correct;
-                const lang = expLang[q.id] || "id";
+                const explLang = expLang[q.id] || lang;
                 return (
                   <div key={q.id} className="bg-white border border-slate-200 rounded-2xl overflow-hidden">
                     <div className="p-5 pb-4">
@@ -388,15 +435,15 @@ export default function PracticePage({ params }: { params: Promise<{ domainId: s
                           <div className="px-5 pb-5">
                             <button
                               onClick={() =>
-                                setExpLang((prev) => ({ ...prev, [q.id]: prev[q.id] === "en" ? "id" : "en" }))
+                                setExpLang((prev) => ({ ...prev, [q.id]: (prev[q.id] || lang) === "en" ? "id" : "en" }))
                               }
                               className="flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-600 mb-3"
                             >
                               <Globe className="w-3.5 h-3.5" />
-                              {lang === "id" ? "Switch to English" : "Ganti ke Bahasa Indonesia"}
+                              {explLang === "id" ? "Switch to English" : "Ganti ke Bahasa Indonesia"}
                             </button>
                             <div className="bg-slate-50 rounded-xl p-4 text-sm text-slate-700 leading-relaxed">
-                              {lang === "id" ? q.explanation_id : q.explanation_en}
+                              {explLang === "id" ? q.explanation_id : q.explanation_en}
                             </div>
                             <p className="text-xs text-slate-400 mt-2">📚 {q.babok_reference}</p>
                           </div>
